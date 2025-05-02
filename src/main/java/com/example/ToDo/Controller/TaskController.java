@@ -1,6 +1,7 @@
 package com.example.ToDo.Controller;
 
 import com.example.ToDo.DTO.TaskRequest;
+import com.example.ToDo.DTO.TaskResponse;
 import com.example.ToDo.Exception.TaskNotFoundException;
 import com.example.ToDo.Model.Task;
 import com.example.ToDo.ServiceInterface.TaskService;
@@ -20,7 +21,7 @@ public class TaskController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<String> createTask(@RequestBody TaskRequest taskRequest) {
+    public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest taskRequest) {
         return taskService.createTask(taskRequest);
     }
 

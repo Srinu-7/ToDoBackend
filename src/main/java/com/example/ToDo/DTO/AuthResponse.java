@@ -8,9 +8,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Data
 @Builder
-public class TaskRequest {
-    String operation;
-    String task;
-    String urgency;
-    String dateTime;
+public class AuthResponse {
+     String jwt;
+     boolean status;
 }

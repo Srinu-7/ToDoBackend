@@ -8,9 +8,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Data
 @Builder
-public class TaskRequest {
-    String operation;
-    String task;
-    String urgency;
-    String dateTime;
+public class SignUpRequest {
+    String email;
+    String password;
+    String phoneNumber;
 }

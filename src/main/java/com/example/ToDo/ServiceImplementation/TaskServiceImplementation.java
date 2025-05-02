@@ -2,6 +2,7 @@ package com.example.ToDo.ServiceImplementation;
 
 import com.example.ToDo.Converter.TaskConverter;
 import com.example.ToDo.DTO.TaskRequest;
+import com.example.ToDo.DTO.TaskResponse;
 import com.example.ToDo.Exception.TaskNotFoundException;
 import com.example.ToDo.Model.Task;
 import com.example.ToDo.Repository.TaskRepository;
@@ -11,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
 @Service
 public class TaskServiceImplementation implements TaskService {
 
@@ -22,14 +22,16 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     @Override
-    public ResponseEntity<String> createTask(TaskRequest taskRequest) {
+    public ResponseEntity<TaskResponse> createTask(TaskRequest taskRequest) {
         if(taskRequest == null) throw new RuntimeException("TaskRequest is null");
-        if(taskRequest.getTask() == null || taskRequest.getTask().isEmpty()) return new ResponseEntity<>("Task is null", HttpStatus.BAD_REQUEST);
-        if(taskRequest.getUrgency() == null || taskRequest.getUrgency().isEmpty()) return new ResponseEntity<>("Urgency is null", HttpStatus.BAD_REQUEST);
-        if(taskRequest.getOperation() == null || taskRequest.getOperation().isEmpty()) return new ResponseEntity<>("Operation is null", HttpStatus.BAD_REQUEST);
+        if(taskRequest.getTask() == null || taskRequest.getTask().isEmpty()) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        if(taskRequest.getUrgency() == null || taskRequest.getUrgency().isEmpty()) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        if(taskRequest.getOperation() == null || taskRequest.getOperation().isEmpty()) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         Task task = TaskConverter.TaskRequestToTask(taskRequest);
+        task.setCompleted(true);
         taskRepository.save(task);
-        return new ResponseEntity<>("Task created", HttpStatus.CREATED);
+        TaskResponse taskResponse = TaskConverter.TaskToTaskResponse(task);
+        return new ResponseEntity<>(taskResponse, HttpStatus.CREATED);
     }
 
     @Override

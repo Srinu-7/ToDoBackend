@@ -7,8 +7,6 @@ import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
-
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,5 +20,6 @@ public class Task {
     String operation;
     String task;
     String urgency;
-    Date date;
+    String dateTime;
+    boolean completed = false;
 }

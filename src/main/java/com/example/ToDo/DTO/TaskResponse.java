@@ -8,7 +8,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Data
 @Builder
-public class TaskRequest {
+public class TaskResponse {
+    Long id;
     String operation;
     String task;
     String urgency;

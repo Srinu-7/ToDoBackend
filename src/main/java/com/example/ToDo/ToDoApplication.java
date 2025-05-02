@@ -14,7 +14,10 @@ public class ToDoApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ToDoApplication.class, args);
+		stemExample(); // Call the method to demonstrate stemming
+	}
 
+	private static void stemExample() {
 		// Dynamic stop words list (can be replaced with input from a file or database)
 		List<String> dynamicStopWords = Arrays.asList("men"); // Add your dynamic stop words here
 		CharArraySet stopWords = new CharArraySet(dynamicStopWords, true); // Create CharArraySet from the list
@@ -22,5 +25,4 @@ public class ToDoApplication {
 		MyAnalyzer myAnalyzer = new MyAnalyzer(stopWords, new HashSet<>());
 		System.out.println(myAnalyzer.stem("nikes shoes for mens"));
 	}
-
 }

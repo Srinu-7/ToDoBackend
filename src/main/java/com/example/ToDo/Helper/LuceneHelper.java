@@ -7,12 +7,12 @@ import org.apache.lucene.search.Query;
 
 public class LuceneHelper {
     public static void main(String[] args) throws ParseException {
-        StandardAnalyzer analyzer = new StandardAnalyzer();
-        QueryParser parser = new QueryParser("content", analyzer);
+        StandardAnalyzer analyzer = new StandardAnalyzer();// Create an instance of StandardAnalyzer
+        QueryParser parser = new QueryParser("content", analyzer);// Create an instance of QueryParser
 
-        String userQuery = "hello world";
-        Query query = parser.parse(userQuery);
+        String userQuery = "hello world";// The user's query
+        Query query = parser.parse(userQuery);// Parse the user's query
 
-        System.out.println(query.toString());
+        System.out.println(query.toString());// Print the parsed query
     }
 }
