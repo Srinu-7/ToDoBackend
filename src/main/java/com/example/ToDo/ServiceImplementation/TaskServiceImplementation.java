@@ -1,17 +1,15 @@
 package com.example.ToDo.ServiceImplementation;
 
-import com.example.ToDo.Converter.TaskConverter;
 import com.example.ToDo.DTO.TaskRequest;
-import com.example.ToDo.DTO.TaskResponse;
 import com.example.ToDo.Exception.TaskNotFoundException;
 import com.example.ToDo.Model.Task;
 import com.example.ToDo.Repository.TaskRepository;
 import com.example.ToDo.ServiceInterface.TaskService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+
 @Service
 public class TaskServiceImplementation implements TaskService {
 
@@ -22,59 +20,39 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     @Override
-    public ResponseEntity<TaskResponse> createTask(TaskRequest taskRequest) {
-        if(taskRequest == null) throw new RuntimeException("TaskRequest is null");
-        if(taskRequest.getTask() == null || taskRequest.getTask().isEmpty()) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        if(taskRequest.getUrgency() == null || taskRequest.getUrgency().isEmpty()) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        if(taskRequest.getOperation() == null || taskRequest.getOperation().isEmpty()) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        Task task = TaskConverter.TaskRequestToTask(taskRequest);
-        task.setCompleted(true);
-        taskRepository.save(task);
-        TaskResponse taskResponse = TaskConverter.TaskToTaskResponse(task);
-        return new ResponseEntity<>(taskResponse, HttpStatus.CREATED);
+    public Task createTask(TaskRequest request) {
+        Task task = new Task();
+        task.setTask(request.getTask());
+        task.setUrgency(request.getUrgency());
+        task.setOperation(request.getOperation());
+        task.setDateTime(request.getDateTime());
+        task.setCreatedAt(LocalDateTime.now());
+        task.setUpdatedAt(LocalDateTime.now());
+        return task;
     }
 
     @Override
-    public ResponseEntity<Task> getTask(Long id) throws TaskNotFoundException {
-        try{
-            Task task = taskRepository.findById(id).get();
-            if(task == null) throw new TaskNotFoundException("Task not found with id: " + id);
-            return new ResponseEntity<>(task, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+    public Task updateTask(Long id, TaskRequest request, List<Task> userTasks) throws TaskNotFoundException {
+        Task task = findTask(userTasks, id, true);
+
+        task.setTask(request.getTask());
+        task.setUrgency(request.getUrgency());
+        task.setOperation(request.getOperation());
+        task.setUpdatedAt(LocalDateTime.now());
+
+        return taskRepository.save(task);
     }
 
     @Override
-    public ResponseEntity<Task> updateTask(Long id, TaskRequest taskRequest) throws TaskNotFoundException {
-        try{
-            Task task = taskRepository.findById(id).get();
-            if(task == null) throw new TaskNotFoundException("Task not found with id: " + id);
-            task.setTask(taskRequest.getTask());
-            task.setUrgency(taskRequest.getUrgency());
-            task.setOperation(taskRequest.getOperation());
-            taskRepository.save(task);
-            return new ResponseEntity<>(task, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+    public void deleteTask(Task task) {
+        taskRepository.delete(task);
     }
 
     @Override
-    public ResponseEntity<List<Task>> getAllTasks() {
-        List<Task> tasks = taskRepository.findAll();
-        return new ResponseEntity<>(tasks, HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity<String> deleteTask(Long id) throws TaskNotFoundException {
-        try{
-            Task task = taskRepository.findById(id).get();
-            if(task == null) throw new TaskNotFoundException("Task not found with id: " + id);
-            taskRepository.delete(task);
-            return new ResponseEntity<>("Task deleted", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
+    public Task findTask(List<Task> tasks, Long taskId, boolean throwExceptionIfNotFound) throws TaskNotFoundException {
+        return tasks.stream()
+                .filter(t -> t.getId().equals(taskId))
+                .findFirst()
+                .orElseThrow(() -> throwExceptionIfNotFound ? new TaskNotFoundException("Task not found with id: " + taskId) : null);
     }
 }
