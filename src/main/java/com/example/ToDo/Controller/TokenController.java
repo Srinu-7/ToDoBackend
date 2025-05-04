@@ -46,7 +46,7 @@ public class TokenController {
 
             if (token == null || token.isEmpty()) {
                 logger.warning("GITHUB_TOKEN environment variable not found or empty");
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);Merge branch 'main' of [https://github.com/Srinu-7/ToDoBackend](https://github.com/Srinu-7/ToDoBackend)
             }
 
             // Return the token in a JSON response
