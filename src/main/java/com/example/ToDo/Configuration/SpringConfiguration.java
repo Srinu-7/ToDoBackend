@@ -1,5 +1,6 @@
 package com.example.ToDo.Configuration;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import org.apache.lucene.analysis.CharArraySet;
@@ -9,25 +10,24 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-
 import java.util.Arrays;
 import java.util.Properties;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class SpringConfiguration {
+    private static final Dotenv dotenv = Dotenv.load();
+    private static final String PASSWORD = dotenv.get("PASSWORD");
 
     @Bean
     public JwtParser jwtParser() {
         return Jwts.parser();
     }
 
-    // Bean for password encoding
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Example CharArraySet Bean
     @Bean
     public CharArraySet charArraySet() {
         return new CharArraySet(Arrays.asList("men"), true);
@@ -36,11 +36,10 @@ public class SpringConfiguration {
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.gmail.com"); // Replace with your SMTP server
-        mailSender.setPort(587); // Replace with your SMTP port
-
-        mailSender.setUsername("makasrinivasulu11@gmail.com"); // Replace with your email
-        mailSender.setPassword("8374006607"); // Replace with your email password
+        mailSender.setHost("smtp.gmail.com");
+        mailSender.setPort(587);
+        mailSender.setUsername("makasrinivasulu11@gmail.com");
+        mailSender.setPassword(PASSWORD);
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
@@ -50,5 +49,4 @@ public class SpringConfiguration {
 
         return mailSender;
     }
-
 }

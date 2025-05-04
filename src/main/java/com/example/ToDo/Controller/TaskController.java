@@ -5,6 +5,7 @@ import com.example.ToDo.Exception.TaskNotFoundException;
 import com.example.ToDo.Exception.UserNotFoundException;
 import com.example.ToDo.Model.Task;
 import com.example.ToDo.Model.User;
+import com.example.ToDo.Notification.NotificationService;
 import com.example.ToDo.Repository.TaskRepository;
 import com.example.ToDo.Repository.UserRepository;
 import com.example.ToDo.ServiceInterface.TaskService;
@@ -23,12 +24,14 @@ public class TaskController {
     private final UserService userService;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
-    public TaskController(TaskService taskService, UserService userService, TaskRepository taskRepository, UserRepository userRepository) {
+    public TaskController(TaskService taskService, UserService userService, TaskRepository taskRepository, UserRepository userRepository, NotificationService notificationService) {
         this.taskService = taskService;
         this.userService = userService;
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     @PostMapping("/")
@@ -45,6 +48,9 @@ public class TaskController {
 
         user.getTasks().add(task);
         userRepository.save(user);
+
+        notificationService.sendEmailNotification(task, user, false);
+        notificationService.sendSMSNotification(task, user, false);
 
         return new ResponseEntity<>(task, HttpStatus.CREATED);
     }
@@ -67,6 +73,8 @@ public class TaskController {
     public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody TaskRequest taskRequest, @RequestHeader("Authorization") String jwt) throws TaskNotFoundException, UserNotFoundException {
         User user = userService.findUserProfileByJwt(jwt);
         Task updatedTask = taskService.updateTask(id, taskRequest, user.getTasks());
+        notificationService.sendEmailNotification(updatedTask, user, true);
+        notificationService.sendSMSNotification(updatedTask, user, true);
         return new ResponseEntity<>(updatedTask, HttpStatus.OK);
     }
 

@@ -126,6 +126,12 @@
 			<artifactId>google-api-services-gmail</artifactId>
 			<version>v1-rev20220404-2.0.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.github.cdimascio/java-dotenv -->
+		<dependency>
+			<groupId>io.github.cdimascio</groupId>
+			<artifactId>java-dotenv</artifactId>
+			<version>5.2.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>

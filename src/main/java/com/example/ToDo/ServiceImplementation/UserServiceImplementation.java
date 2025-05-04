@@ -5,9 +5,10 @@ import com.example.ToDo.JWT_PACKAGE.JwtTokenProvider;
 import com.example.ToDo.Model.User;
 import com.example.ToDo.Repository.UserRepository;
 import com.example.ToDo.ServiceInterface.UserService;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
-import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImplementation implements UserService {

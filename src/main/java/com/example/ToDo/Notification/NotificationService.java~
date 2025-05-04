@@ -57,7 +57,7 @@ public class NotificationService {
         );
 
         try {
-            smsService.sendSms("+91"+user.getPhoneNumber(), message);
+            smsService.sendSms(user.getPhoneNumber(), message);
         } catch (Exception e) {
             // Log the error or handle it appropriately
             log.error("Failed to send SMS to {}: {}", user.getPhoneNumber(), e.getMessage(), e);
