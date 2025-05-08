@@ -1,14 +1,19 @@
+// LoginRequest.java
 package com.example.ToDo.DTO;
 
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Schema(description = "Login request payload")
 public class LoginRequest {
-    String email;
-    String password;
+    @Schema(description = "User's email address", example = "user@example.com", required = true)
+    private String email;
+
+    @Schema(description = "User's password", example = "password123", required = true)
+    private String password;
 }

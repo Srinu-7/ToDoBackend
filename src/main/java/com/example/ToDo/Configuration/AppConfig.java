@@ -24,6 +24,15 @@ public class AppConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        // Allow Swagger UI resources
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/api-docs/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll())
                 .addFilterBefore(new JwtTokenValidator(), BasicAuthenticationFilter.class)
@@ -37,6 +46,7 @@ public class AppConfig {
 
     private CorsConfiguration corsConfiguration(HttpServletRequest request) {
         CorsConfiguration cfg = new CorsConfiguration();
+        // Use the same origin list as in WebConfig
         cfg.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
                 "http://localhost:4000",

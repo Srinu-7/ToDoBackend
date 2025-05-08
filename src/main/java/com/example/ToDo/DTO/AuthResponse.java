@@ -1,14 +1,18 @@
 package com.example.ToDo.DTO;
 
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Schema(description = "Authentication response after successful login or registration")
 public class AuthResponse {
-     String jwt;
-     boolean status;
+     @Schema(description = "JWT token for authentication", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+     private String jwt;
+
+     @Schema(description = "Indicates if the authentication was successful", example = "true")
+     private boolean status;
 }

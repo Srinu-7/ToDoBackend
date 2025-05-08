@@ -15,6 +15,13 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import io.github.cdimascio.dotenv.Dotenv;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,9 +39,10 @@ import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*") // Ensure CORS is properly configured
+@Tag(name = "Authentication", description = "API endpoints for user authentication")
 public class AuthController {
 
+    private static final Dotenv dotenv = Dotenv.load();
     private static final Logger LOGGER = Logger.getLogger(AuthController.class.getName());
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -43,7 +51,7 @@ public class AuthController {
     private final MyAnalyzer myAnalyzer;
 
     // Your Google Client ID
-    private static final String CLIENT_ID = "914331726031-nkbnstpbun49j9hhq3dphlmmsgareev4.apps.googleusercontent.com";
+    private static final String CLIENT_ID = dotenv.get("CLIENT_ID");
 
     public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService, MyAnalyzer myAnalyzer) {
         this.userRepository = userRepository;
@@ -54,6 +62,13 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
+    @Operation(summary = "Register a new user", description = "Creates a new user account with email and password")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User registered successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "409", description = "Email is already in use")
+    })
     public ResponseEntity<AuthResponse> signUp(@RequestBody SignUpRequest user) throws UserAlreadyFoundException, UserNotFoundException {
         String email = user.getEmail();
         email = myAnalyzer.stem(email);
@@ -81,6 +96,13 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
+    @Operation(summary = "User login", description = "Authenticates a user and returns a JWT token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login successful",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
     public ResponseEntity<AuthResponse> signIn(@RequestBody LoginRequest loginRequest) throws UserNotFoundException {
         String username = loginRequest.getEmail();
         username = myAnalyzer.stem(username);
@@ -96,8 +118,16 @@ public class AuthController {
     }
 
     @PostMapping(value = "/google-signup", consumes = "text/plain")
+    @Operation(summary = "Register with Google", description = "Creates a new user account using Google authentication")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User registered successfully with Google",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Invalid Google token"),
+            @ApiResponse(responseCode = "409", description = "Email is already in use"),
+            @ApiResponse(responseCode = "500", description = "Server error")
+    })
     public ResponseEntity<?> googleSignUp(@RequestBody String idTokenString) {
-        LOGGER.info("Received Google signup request with token: " + idTokenString.substring(0, 20) + "...");
+        LOGGER.info("Received Google signup request with token: " + idTokenString.substring(0, Math.min(20, idTokenString.length())) + "...");
 
         try {
             // Process the token and extract the user info
@@ -154,6 +184,14 @@ public class AuthController {
     }
 
     @PostMapping(value = "/google-signin", consumes = "text/plain")
+    @Operation(summary = "Login with Google", description = "Authenticates a user with Google and returns a JWT token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login successful with Google",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Invalid Google token"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "500", description = "Server error")
+    })
     public ResponseEntity<?> googleSignIn(@RequestBody String idTokenString) {
         LOGGER.info("Received Google signin request");
 
